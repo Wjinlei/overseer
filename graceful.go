@@ -11,22 +11,22 @@ import (
 	"time"
 )
 
-func newOverseerListener(l net.Listener) *overseerListener {
-	return &overseerListener{
+func newOverseerListener(l net.Listener) *OverseerListener {
+	return &OverseerListener{
 		Listener:     l,
 		closeByForce: make(chan bool),
 	}
 }
 
 //gracefully closing net.Listener
-type overseerListener struct {
+type OverseerListener struct {
 	net.Listener
 	closeError   error
 	closeByForce chan bool
 	wg           sync.WaitGroup
 }
 
-func (l *overseerListener) Accept() (net.Conn, error) {
+func (l *OverseerListener) Accept() (net.Conn, error) {
 	conn, err := l.Listener.(*net.TCPListener).AcceptTCP()
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (l *overseerListener) Accept() (net.Conn, error) {
 }
 
 //non-blocking trigger close
-func (l *overseerListener) release(timeout time.Duration) {
+func (l *OverseerListener) release(timeout time.Duration) {
 	//stop accepting connections - release fd
 	l.closeError = l.Listener.Close()
 	//start timer, close by force if deadline not met
@@ -72,12 +72,12 @@ func (l *overseerListener) release(timeout time.Duration) {
 }
 
 //blocking wait for close
-func (l *overseerListener) Close() error {
+func (l *OverseerListener) Close() error {
 	l.wg.Wait()
 	return l.closeError
 }
 
-func (l *overseerListener) File() *os.File {
+func (l *OverseerListener) File() *os.File {
 	// returns a dup(2) - FD_CLOEXEC flag *not* set
 	tl := l.Listener.(*net.TCPListener)
 	fl, _ := tl.File()

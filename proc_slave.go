@@ -49,7 +49,7 @@ type State struct {
 type slave struct {
 	*Config
 	id         string
-	listeners  []*overseerListener
+	listeners  []*OverseerListener
 	masterPid  int
 	masterProc *os.Process
 	state      State
@@ -84,7 +84,7 @@ func (sp *slave) initFileDescriptors() error {
 	if err != nil {
 		return fmt.Errorf("invalid %s integer", envNumFDs)
 	}
-	sp.listeners = make([]*overseerListener, numFDs)
+	sp.listeners = make([]*OverseerListener, numFDs)
 	sp.state.Listeners = make([]net.Listener, numFDs)
 	for i := 0; i < numFDs; i++ {
 		f := os.NewFile(uintptr(3+i), "")
