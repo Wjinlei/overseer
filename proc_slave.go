@@ -71,7 +71,8 @@ func (sp *slave) run() error {
 	if err := sp.initFileDescriptors(); err != nil {
 		return err
 	}
-	sp.watchSignal()
+	//sp.watchSignal()
+
 	//run program with state
 	sp.debugf("start program")
 	sp.Config.Program(sp.state)
